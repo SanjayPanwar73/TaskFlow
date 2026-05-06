@@ -65,7 +65,7 @@ export default function Signup() {
         password: form.password,
       });
 
-      login(data.user);
+      login(data.user, data.token);
       toast.success('Account created successfully.');
       navigate('/dashboard', { replace: true });
     } catch (err) {

@@ -44,7 +44,7 @@ export default function Login() {
 
     try {
       const { data } = await api.post('/auth/login', form);
-      login(data.user);
+      login(data.user, data.token);
       toast.success(`Welcome back, ${data.user.name}!`);
       navigate('/dashboard', { replace: true });
     } catch (err) {

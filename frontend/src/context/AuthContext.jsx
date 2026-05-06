@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import api from '../api/axios';
+import { clearStoredAuthToken, setStoredAuthToken } from '../utils/authToken';
 
 const AuthContext = createContext(null);
 
@@ -15,6 +16,7 @@ export const AuthProvider = ({ children }) => {
         return;
       }
 
+      clearStoredAuthToken();
       setUser(null);
       setLoading(false);
     };
@@ -28,9 +30,13 @@ export const AuthProvider = ({ children }) => {
         }
 
         setUser(data.user);
-      } catch {
+      } catch (error) {
         if (!isMounted) {
           return;
+        }
+
+        if (error?.response?.status === 401) {
+          clearStoredAuthToken();
         }
 
         setUser(null);
@@ -50,7 +56,11 @@ export const AuthProvider = ({ children }) => {
     };
   }, []);
 
-  const login = (userData) => {
+  const login = (userData, token) => {
+    if (token) {
+      setStoredAuthToken(token);
+    }
+
     setUser(userData);
   };
 
@@ -60,6 +70,7 @@ export const AuthProvider = ({ children }) => {
     } catch {
       // Ignore logout transport errors and clear local state regardless.
     } finally {
+      clearStoredAuthToken();
       setUser(null);
     }
   };

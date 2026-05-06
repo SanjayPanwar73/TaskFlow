@@ -42,6 +42,7 @@ const signup = async (req, res, next) => {
 
     return res.status(201).json({
       message: 'Account created successfully.',
+      token,
       user: serializeUser(user),
     });
   } catch (error) {
@@ -70,6 +71,7 @@ const login = async (req, res, next) => {
 
     return res.json({
       message: 'Login successful.',
+      token,
       user: serializeUser(user),
     });
   } catch (error) {

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../api/axios';
+import AuthRolePicker from '../components/AuthRolePicker';
 import { useAuth } from '../context/AuthContext';
 import getApiError from '../utils/getApiError';
 
@@ -18,7 +19,7 @@ export default function Login() {
   const { login, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({ email: '', password: '' });
+  const [form, setForm] = useState({ email: '', password: '', role: 'Member' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -75,7 +76,7 @@ export default function Login() {
             </svg>
           </div>
           <h1 className="text-2xl font-bold text-white">TaskFlow</h1>
-          <p className="text-slate-400 mt-1 text-sm">Sign in to your account</p>
+          <p className="text-slate-400 mt-1 text-sm">Sign in as an admin or member</p>
         </div>
 
         <div className="card">
@@ -86,6 +87,15 @@ export default function Login() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            <AuthRolePicker
+              value={form.role}
+              onChange={(role) => {
+                setForm((currentForm) => ({ ...currentForm, role }));
+                setError('');
+              }}
+              label="Sign in as"
+            />
+
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-1.5">Email</label>
               <input
@@ -106,7 +116,7 @@ export default function Login() {
                 name="password"
                 value={form.password}
                 onChange={handleChange}
-                placeholder="Enter your password"
+                placeholder={`Enter your ${form.role.toLowerCase()} password`}
                 required
                 className="input-field"
               />

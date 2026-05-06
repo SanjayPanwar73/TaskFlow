@@ -21,7 +21,7 @@ const clearAuthCookie = (req, res) => {
 };
 
 const signup = async (req, res, next) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, role = 'Member' } = req.body;
 
   try {
     const existingUser = await User.findOne({ email });
@@ -34,7 +34,7 @@ const signup = async (req, res, next) => {
       name,
       email,
       password,
-      role: 'Member',
+      role,
     });
 
     const token = generateToken(user._id);
@@ -51,7 +51,7 @@ const signup = async (req, res, next) => {
 };
 
 const login = async (req, res, next) => {
-  const { email, password } = req.body;
+  const { email, password, role } = req.body;
 
   try {
     const user = await User.findOne({ email }).select('+password');
@@ -64,6 +64,10 @@ const login = async (req, res, next) => {
 
     if (!isMatch) {
       return res.status(401).json({ message: 'Invalid email or password.' });
+    }
+
+    if (role && user.role !== role) {
+      return res.status(401).json({ message: 'Selected role does not match this account.' });
     }
 
     const token = generateToken(user._id);

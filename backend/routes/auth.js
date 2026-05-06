@@ -29,6 +29,10 @@ const signupValidation = [
       minSymbols: 0,
     })
     .withMessage('Password must be at least 8 characters and include upper, lower, and number.'),
+  body('role')
+    .optional()
+    .isIn(['Admin', 'Member'])
+    .withMessage('Role must be Admin or Member.'),
 ];
 
 const loginValidation = [
@@ -38,6 +42,10 @@ const loginValidation = [
     .withMessage('Valid email is required.')
     .normalizeEmail(),
   body('password').notEmpty().withMessage('Password is required.'),
+  body('role')
+    .optional()
+    .isIn(['Admin', 'Member'])
+    .withMessage('Role must be Admin or Member.'),
 ];
 
 router.post('/signup', authRateLimiter, signupValidation, validateRequest, signup);

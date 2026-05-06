@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../api/axios';
+import AuthRolePicker from '../components/AuthRolePicker';
 import { useAuth } from '../context/AuthContext';
 import getApiError from '../utils/getApiError';
 
@@ -23,6 +24,7 @@ export default function Signup() {
     email: '',
     password: '',
     confirmPassword: '',
+    role: 'Member',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -63,6 +65,7 @@ export default function Signup() {
         name: form.name,
         email: form.email,
         password: form.password,
+        role: form.role,
       });
 
       login(data.user, data.token);
@@ -96,7 +99,7 @@ export default function Signup() {
             </svg>
           </div>
           <h1 className="text-2xl font-bold text-white">TaskFlow</h1>
-          <p className="text-slate-400 mt-1 text-sm">Create your account. All new accounts start as members.</p>
+          <p className="text-slate-400 mt-1 text-sm">Create an admin or member account</p>
         </div>
 
         <div className="card">
@@ -107,6 +110,15 @@ export default function Signup() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            <AuthRolePicker
+              value={form.role}
+              onChange={(role) => {
+                setForm((currentForm) => ({ ...currentForm, role }));
+                setError('');
+              }}
+              label="Create account as"
+            />
+
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-1.5">Full Name</label>
               <input

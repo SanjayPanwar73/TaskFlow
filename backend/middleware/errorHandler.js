@@ -28,7 +28,11 @@ const errorHandler = (err, req, res, next) => {
   const statusCode = normalizedError.statusCode || 500;
   const isProduction = process.env.NODE_ENV === 'production';
 
-  console.error('Unhandled error:', err);
+  if (statusCode >= 500) {
+    console.error('Unhandled error:', err);
+  } else {
+    console.warn(`${statusCode} ${req.method} ${req.originalUrl}: ${normalizedError.message}`);
+  }
 
   return res.status(statusCode).json({
     message: normalizedError.message || 'Internal server error.',

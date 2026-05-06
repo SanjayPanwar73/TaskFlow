@@ -10,10 +10,18 @@ const { securityHeaders } = require('./middleware/security');
 dotenv.config();
 
 const app = express();
-const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
+const normalizeOrigin = (origin = '') => origin.trim().replace(/\/+$/, '');
+const configuredOrigins = (process.env.CLIENT_URL || '')
   .split(',')
-  .map((origin) => origin.trim())
+  .map((origin) => normalizeOrigin(origin))
   .filter(Boolean);
+const devOrigins = ['http://localhost:5173', 'http://127.0.0.1:5173'];
+const allowedOrigins = [
+  ...new Set([
+    ...configuredOrigins,
+    ...(process.env.NODE_ENV === 'production' ? [] : devOrigins),
+  ]),
+];
 
 mongoose.set('sanitizeFilter', true);
 
@@ -22,7 +30,9 @@ app.use(securityHeaders);
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      const normalizedOrigin = normalizeOrigin(origin);
+
+      if (!origin || allowedOrigins.includes(normalizedOrigin)) {
         return callback(null, true);
       }
 

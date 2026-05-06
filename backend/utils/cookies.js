@@ -18,13 +18,46 @@ const parseCookies = (cookieHeader = '') =>
       return cookies;
     }, {});
 
-const getAuthCookieOptions = () => {
-  const isProduction = process.env.NODE_ENV === 'production';
+const getRequestOrigin = (req) => {
+  const origin = req?.headers?.origin;
+
+  if (!origin) {
+    return '';
+  }
+
+  try {
+    return new URL(origin).origin;
+  } catch {
+    return '';
+  }
+};
+
+const getRequestHostOrigin = (req) => {
+  const forwardedProto = req?.headers?.['x-forwarded-proto'];
+  const proto = forwardedProto || req?.protocol || 'http';
+  const host = req?.get?.('host');
+
+  if (!host) {
+    return '';
+  }
+
+  return `${proto}://${host}`;
+};
+
+const getAuthCookieOptions = (req) => {
+  const requestOrigin = getRequestOrigin(req);
+  const requestHostOrigin = getRequestHostOrigin(req);
+  const isCrossSiteRequest =
+    Boolean(requestOrigin) && Boolean(requestHostOrigin) && requestOrigin !== requestHostOrigin;
+  const isHttpsRequest =
+    req?.secure === true ||
+    req?.headers?.['x-forwarded-proto'] === 'https' ||
+    requestOrigin.startsWith('https://');
 
   return {
     httpOnly: true,
-    secure: isProduction,
-    sameSite: isProduction ? 'none' : 'lax',
+    secure: isHttpsRequest,
+    sameSite: isCrossSiteRequest ? 'none' : 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000,
     path: '/',
   };

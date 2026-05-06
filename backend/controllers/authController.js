@@ -14,8 +14,8 @@ const serializeUser = (user) => ({
   updatedAt: user.updatedAt,
 });
 
-const clearAuthCookie = (res) => {
-  const cookieOptions = getAuthCookieOptions();
+const clearAuthCookie = (req, res) => {
+  const cookieOptions = getAuthCookieOptions(req);
   delete cookieOptions.maxAge;
   res.clearCookie(COOKIE_NAME, cookieOptions);
 };
@@ -38,7 +38,7 @@ const signup = async (req, res, next) => {
     });
 
     const token = generateToken(user._id);
-    res.cookie(COOKIE_NAME, token, getAuthCookieOptions());
+    res.cookie(COOKIE_NAME, token, getAuthCookieOptions(req));
 
     return res.status(201).json({
       message: 'Account created successfully.',
@@ -66,7 +66,7 @@ const login = async (req, res, next) => {
     }
 
     const token = generateToken(user._id);
-    res.cookie(COOKIE_NAME, token, getAuthCookieOptions());
+    res.cookie(COOKIE_NAME, token, getAuthCookieOptions(req));
 
     return res.json({
       message: 'Login successful.',
@@ -78,7 +78,7 @@ const login = async (req, res, next) => {
 };
 
 const logout = async (req, res) => {
-  clearAuthCookie(res);
+  clearAuthCookie(req, res);
   return res.json({ message: 'Logged out successfully.' });
 };
 

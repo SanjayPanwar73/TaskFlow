@@ -5,6 +5,10 @@ const getApiError = (error, fallbackMessage = 'Something went wrong.') => {
     return validationErrors.map((item) => item.message || item).join(' ');
   }
 
+  if (error?.code === 'ERR_NETWORK' || (error?.request && !error?.response)) {
+    return 'Cannot reach the server. Check Render env vars, CORS, and backend status.';
+  }
+
   return error?.response?.data?.message || fallbackMessage;
 };
 

@@ -10,6 +10,7 @@ const { securityHeaders } = require('./middleware/security');
 dotenv.config();
 
 const app = express();
+app.set('trust proxy', 1);
 const normalizeOrigin = (origin = '') => origin.trim().replace(/\/+$/, '');
 const configuredOrigins = (process.env.CLIENT_URL || '')
   .split(',')

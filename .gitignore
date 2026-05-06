@@ -3,6 +3,7 @@ frontend/node_modules/
 frontend/dist/
 backend/.env
 frontend/.env
+frontend/image.png
 *.log
 .DS_Store
 Thumbs.db
